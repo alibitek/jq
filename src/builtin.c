@@ -511,7 +511,7 @@ static jv f_format(jq_state *jq, jv input, jv fmt) {
   } else if (!strcmp(fmt_s, "text")) {
     jv_free(fmt);
     return f_tostring(jq, input);
-  } else if (!strcmp(fmt_s, "csv") || !strcmp(fmt_s, "tsv")) {
+  } else if (!strcmp(fmt_s, "csv") || !strcmp(fmt_s, "tsv") || !strcmp(fmt_s, "dsv")) {
     const char *quotes, *sep, *escapings;
     const char *msg;
     if (!strcmp(fmt_s, "csv")) {
@@ -519,12 +519,17 @@ static jv f_format(jq_state *jq, jv input, jv fmt) {
       quotes = "\"";
       sep = ",";
       escapings = "\"\"\"\0";
-    } else {
+    } else if (!strcmp(fmt_s, "tsv")) {
       msg = "cannot be tsv-formatted, only array";
       assert(!strcmp(fmt_s, "tsv"));
       quotes = "";
       sep = "\t";
       escapings = "\t\\t\0\r\\r\0\n\\n\0\\\\\\\0";
+    } else {
+        msg = "cannot be dsv-formatted, only array";
+        quotes = "\"";
+        sep = "~";
+        escapings = "\"\"\"\0";
     }
     jv_free(fmt);
     if (jv_get_kind(input) != JV_KIND_ARRAY)
